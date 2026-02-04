@@ -28,14 +28,18 @@ public class User {
     @Embedded
     private Email email;
 
-    private User(UUID id, String name, Email email) {
+    @Embedded
+    private SocialInfo socialInfo;
+
+    private User(UUID id, String name, Email email, SocialInfo socialInfo) {
         this.id = id;
         this.name = name;
         this.email = email;
+        this.socialInfo = socialInfo;
     }
 
-    public static User create(String name, String email) {
-        return new User(null, name, new Email(email));
+    public static User create(String name, String email, SocialType socialType, String socialId) {
+        return new User(null, name, new Email(email), new SocialInfo(socialType, socialId));
     }
 
 }
