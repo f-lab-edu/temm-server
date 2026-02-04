@@ -8,4 +8,10 @@ public class SocialLoginFailedException extends BusinessException {
     public SocialLoginFailedException() {
         super(ErrorCode.SOCIAL_LOGIN_FAILED);
     }
+
+    public SocialLoginFailedException(String message) {
+        super(ErrorCode.SOCIAL_LOGIN_FAILED,
+            String.format("%s : %s", ErrorCode.SOCIAL_LOGIN_FAILED.getMessage(), message));
+    }
+
 }
