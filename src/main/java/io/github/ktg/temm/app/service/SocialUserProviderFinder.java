@@ -9,7 +9,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 
 @Component
-
 public class SocialUserProviderFinder {
 
     private final Map<SocialType, SocialUserProvider> providers;
