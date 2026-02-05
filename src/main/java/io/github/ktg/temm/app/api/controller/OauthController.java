@@ -27,7 +27,7 @@ public class OauthController {
             @RequestBody @Valid OauthLoginRequest oauthLoginRequest) {
 
         LoginResult loginResult = oauthLoginService.login(socialType,
-            oauthLoginRequest.idToken());
+            oauthLoginRequest.code());
         return ResponseEntity.ok(OauthLoginResponse.from(loginResult));
     }
 }

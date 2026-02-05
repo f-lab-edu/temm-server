@@ -11,10 +11,19 @@ spring:
       ddl-auto: update
   flyway:
     locations: classpath:db/migration
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "https://developers.google.com/oauthplayground"
+            scope: [openid, profile, email]
+        provider:
+          google:
+            token-uri: https://oauth2.googleapis.com/token
 jwt:
   access-token-validity: 3600000 # 1시간
   refresh-token-validity: 2592000000 # 30일
   secret-key: dGlja2V0aW5nLXNlcnZpY2UtYXV0aGVudGljYXRpb24=
-oauth:
-  google:
-    client-id: "916977161279-jbrr7ms8lhd9vif97t4i07vl2eh83orp.apps.googleusercontent.com"

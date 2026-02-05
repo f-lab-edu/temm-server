@@ -7,16 +7,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import io.github.ktg.temm.app.api.dto.OauthLoginRequest;
-import io.github.ktg.temm.app.config.SecurityConfig;
 import io.github.ktg.temm.app.dto.LoginResult;
 import io.github.ktg.temm.app.exception.SocialLoginFailedException;
+import io.github.ktg.temm.app.security.JwtAuthenticationFilter;
 import io.github.ktg.temm.app.service.OAuthLoginService;
 import io.github.ktg.temm.domain.model.SocialType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -24,8 +26,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import tools.jackson.databind.ObjectMapper;
 
-@WebMvcTest(OauthController.class)
-@Import(SecurityConfig.class)
+@WebMvcTest(
+    value = OauthController.class,
+    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = JwtAuthenticationFilter.class)
+)
+@AutoConfigureMockMvc(addFilters = false)
 class OauthControllerTest {
 
     @Autowired
@@ -43,9 +48,9 @@ class OauthControllerTest {
         // given
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
-        String idToken = "idToken";
-        OauthLoginRequest loginRequest = new OauthLoginRequest(idToken);
-        given(oAuthLoginService.login(SocialType.GOOGLE, loginRequest.idToken())).willReturn(new LoginResult(
+        String code = "code";
+        OauthLoginRequest loginRequest = new OauthLoginRequest(code);
+        given(oAuthLoginService.login(SocialType.GOOGLE, loginRequest.code())).willReturn(new LoginResult(
             accessToken,
             refreshToken));
         MockHttpServletRequestBuilder builder = post(
@@ -80,9 +85,9 @@ class OauthControllerTest {
     @DisplayName("ID Token 이 유효하지 않을 경우 Unauthorized (401)")
     void idTokenInvalidWillUnauthorized() throws Exception {
         // given
-        String idToken = "idToken";
-        OauthLoginRequest loginRequest = new OauthLoginRequest(idToken);
-        given(oAuthLoginService.login(SocialType.KAKAO, loginRequest.idToken()))
+        String code = "code";
+        OauthLoginRequest loginRequest = new OauthLoginRequest(code);
+        given(oAuthLoginService.login(SocialType.KAKAO, loginRequest.code()))
             .willThrow(new SocialLoginFailedException());
         MockHttpServletRequestBuilder builder = post(
             "/api/v1/auth/kakao/login")
@@ -98,8 +103,8 @@ class OauthControllerTest {
     @DisplayName("지원 하지 않은 소셜 타입일 경우 Bad Request (400)")
     void notSupportSocialWillBadRequest() throws Exception {
         // given
-        String idToken = "idToken";
-        OauthLoginRequest loginRequest = new OauthLoginRequest(idToken);
+        String code = "code";
+        OauthLoginRequest loginRequest = new OauthLoginRequest(code);
         MockHttpServletRequestBuilder builder = post(
             "/api/v1/auth/naver/login")
             .contentType(MediaType.APPLICATION_JSON)

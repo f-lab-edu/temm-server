@@ -36,12 +36,15 @@ class OAuthLoginServiceTest {
     @Mock
     TokenProvider tokenProvider;
 
+    @Mock
+    SocialTokenService socialTokenService;
+
     OAuthLoginService oAuthLoginService;
 
     @BeforeEach
     void setUp() {
         oAuthLoginService = new OAuthLoginService(socialUserProviderFinder, userRepository,
-            tokenProvider);
+            tokenProvider, socialTokenService);
     }
 
     @Test
@@ -50,10 +53,12 @@ class OAuthLoginServiceTest {
         // given
         SocialType socialType = SocialType.KAKAO;
         String idToken = "idToken";
+        String code = "code";
+        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(Optional.empty());
         // when
         // then
-        assertThatThrownBy(() -> oAuthLoginService.login(socialType, idToken))
+        assertThatThrownBy(() -> oAuthLoginService.login(socialType, code))
             .isInstanceOf(NotSupportSocialTypeException.class)
             .hasMessageContaining("KAKAO");
     }
@@ -64,7 +69,9 @@ class OAuthLoginServiceTest {
         // given
         SocialType socialType = SocialType.KAKAO;
         String idToken = "idToken";
+        String code = "code";
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
+        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider));
         given(mockSocialUserProvider.getUserInfo(idToken)).willThrow(
@@ -72,7 +79,7 @@ class OAuthLoginServiceTest {
         );
         // when
         // then
-        assertThatThrownBy(() -> oAuthLoginService.login(socialType, idToken))
+        assertThatThrownBy(() -> oAuthLoginService.login(socialType, code))
             .isInstanceOf(SocialLoginFailedException.class);
     }
 
@@ -81,6 +88,7 @@ class OAuthLoginServiceTest {
     void notFindUserWillJoin() {
         // given
         SocialType socialType = SocialType.KAKAO;
+        String code = "code";
         String idToken = "idToken";
         String socialId = "socialId";
         String email = "test@test.com";
@@ -88,6 +96,7 @@ class OAuthLoginServiceTest {
         SocialUserInfo socialUserInfo = new SocialUserInfo(socialId, email, name);
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
 
+        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider)
         );
@@ -98,7 +107,7 @@ class OAuthLoginServiceTest {
         given(userRepository.save(any(User.class)))
             .willReturn(savedUser);
         // when
-        oAuthLoginService.login(socialType, idToken);
+        oAuthLoginService.login(socialType, code);
         // then
         then(userRepository).should().save(any(User.class));
     }
@@ -108,6 +117,7 @@ class OAuthLoginServiceTest {
     void returnTokenInfo() {
         // given
         SocialType socialType = SocialType.KAKAO;
+        String code = "code";
         String idToken = "idToken";
         String socialId = "socialId";
         String email = "test@test.com";
@@ -116,6 +126,7 @@ class OAuthLoginServiceTest {
         User mockUser = User.create(name, email, socialType, socialId);
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
 
+        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider)
         );
@@ -129,7 +140,7 @@ class OAuthLoginServiceTest {
         given(tokenProvider.generateRefreshToken(any(String.class))).willReturn(refreshToken);
 
         // when
-        LoginResult result = oAuthLoginService.login(socialType, idToken);
+        LoginResult result = oAuthLoginService.login(socialType, code);
         // then
         assertThat(result.accessToken()).isEqualTo(accessToken);
         assertThat(result.refreshToken()).isEqualTo(refreshToken);

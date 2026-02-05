@@ -13,7 +13,10 @@ public class OauthConfig {
 
     private final String googleClientId;
 
-    public OauthConfig(@Value("${oauth.google.client-id}") String googleClientId) {
+    public OauthConfig(
+        @Value("${spring.security.oauth2.client.registration.google.client-id}")
+        String googleClientId
+    ) {
         this.googleClientId = googleClientId;
     }
 

@@ -19,12 +19,14 @@ public class OAuthLoginService {
     private final SocialUserProviderFinder socialUserProviderFinder;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
+    private final SocialTokenService socialTokenService;
 
     @Transactional
-    public LoginResult login(SocialType socialType, String idToken) {
-        SocialUserProvider socialUserProvider = getSocialUserProvider(
-            socialType);
-        SocialUserInfo socialUserInfo = socialUserProvider.getUserInfo(idToken);
+    public LoginResult login(SocialType socialType, String code) {
+
+        String socialToken = socialTokenService.getToken(socialType, code);
+        SocialUserProvider socialUserProvider = getSocialUserProvider(socialType);
+        SocialUserInfo socialUserInfo = socialUserProvider.getUserInfo(socialToken);
 
         User user = findOrJoin(socialType, socialUserInfo);
         String userId = String.valueOf(user.getId());

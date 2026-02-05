@@ -24,9 +24,9 @@ public class GoogleUserProvider implements SocialUserProvider {
     }
 
     @Override
-    public SocialUserInfo getUserInfo(String idToken) {
+    public SocialUserInfo getUserInfo(String socialToken) {
         try {
-            GoogleIdToken token = verifier.verify(idToken);
+            GoogleIdToken token = verifier.verify(socialToken);
             if (token == null) {
                 throw new SocialLoginFailedException();
             }

@@ -6,5 +6,5 @@ import io.github.ktg.temm.domain.model.SocialType;
 public interface SocialUserProvider {
 
     SocialType getType();
-    SocialUserInfo getUserInfo(String idToken);
+    SocialUserInfo getUserInfo(String socialToken);
 }
