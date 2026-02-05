@@ -1,6 +1,7 @@
 package io.github.ktg.temm.app.api.exception;
 
-import static io.github.ktg.temm.app.api.exception.GlobalErrorCode.*;
+import static io.github.ktg.temm.app.api.exception.GlobalErrorCode.INTERNAL_SERVER_ERROR;
+import static io.github.ktg.temm.app.api.exception.GlobalErrorCode.INVALID_INPUT;
 
 import io.github.ktg.temm.domain.exception.BusinessException;
 import io.github.ktg.temm.domain.exception.ErrorCode;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 @RestControllerAdvice
@@ -51,6 +53,16 @@ public class GlobalExceptionHandler {
             .map(fieldError -> String.format("%s (%s)", fieldError.getDefaultMessage(), fieldError.getField()))
             .collect(Collectors.joining(", "));
 
+        return ResponseEntity
+            .badRequest()
+            .body(new ErrorResponse(INVALID_INPUT.name(), errorMessage));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
+        Class<?> requiredType = ex.getRequiredType();
+        String requiredTypeName = requiredType == null ? "" : requiredType.getSimpleName();
+        String errorMessage = String.format("'%s' is not type '%s'", ex.getValue(), requiredTypeName);
         return ResponseEntity
             .badRequest()
             .body(new ErrorResponse(INVALID_INPUT.name(), errorMessage));

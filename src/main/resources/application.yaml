@@ -1,6 +1,16 @@
 spring:
   application:
     name: temm
+  datasource:
+    url: jdbc:mysql://localhost:3306/temm?useSSL=false&serverTimezone=UTC&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: root
+    password: 1111
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+  flyway:
+    locations: classpath:db/migration
 jwt:
   access-token-validity: 3600000 # 1시간
   refresh-token-validity: 2592000000 # 30일
