@@ -9,16 +9,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import tools.jackson.databind.ObjectMapper;
 
-@Component
 @RequiredArgsConstructor
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -52,17 +47,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 4. 토큰에서 유저 식별자 조회
                 String userId = tokenProvider.getUserIdByAccessToken(token);
 
-                // 5. 인증 객체 생성
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId, null, List.of());
-                // 6. Security Context에 등록
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // 5. Login Context 등록
+                LoginContext.set(userId);
+
             }
         } catch (ExpiredJwtException e) {
             writeExpiredTokenResponse(response);
-            return;
         }
-
         filterChain.doFilter(request, response);
     }
 
@@ -77,4 +68,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             )
         );
     }
+
 }

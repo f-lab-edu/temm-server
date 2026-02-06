@@ -1,34 +1,53 @@
 package io.github.ktg.temm.app.config;
 
 import io.github.ktg.temm.app.security.JwtAuthenticationFilter;
+import io.github.ktg.temm.app.security.LoginCheckFilter;
+import io.github.ktg.temm.app.security.LoginContextHolderFilter;
+import io.github.ktg.temm.domain.provider.TokenProvider;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.AuthenticationEntryPoint;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import tools.jackson.databind.ObjectMapper;
 
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthenticationEntryPoint authenticationEntryPoint;
+    private final TokenProvider tokenProvider;
+    private final ObjectMapper objectMapper;
+    private final String[] noAuthPathPatterns = new String[] {
+        "/api/v1/auth/**"
+    };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
-        http
-            .csrf(AbstractHttpConfigurer::disable)
-            .sessionManagement(
-                session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()
-                .anyRequest().authenticated())
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .exceptionHandling(config -> config.authenticationEntryPoint(authenticationEntryPoint));
-        return http.build();
+    public FilterRegistrationBean<LoginContextHolderFilter> loginContextHolderFilter() {
+        FilterRegistrationBean<LoginContextHolderFilter> bean = new FilterRegistrationBean<>();
+        bean.setFilter(new LoginContextHolderFilter());
+        bean.setOrder(1);
+        bean.addUrlPatterns("/*");
+        return bean;
     }
+
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter() {
+        FilterRegistrationBean<JwtAuthenticationFilter> bean = new FilterRegistrationBean<>();
+        bean.setFilter(new JwtAuthenticationFilter(tokenProvider, objectMapper));
+        bean.setOrder(2);
+        bean.addUrlPatterns("/*");
+        return bean;
+    }
+
+
+    @Bean
+    public FilterRegistrationBean<LoginCheckFilter> loginCheckFilter() {
+        FilterRegistrationBean<LoginCheckFilter> bean = new FilterRegistrationBean<>();
+        bean.setFilter(new LoginCheckFilter(noAuthPathPatterns, objectMapper));
+        bean.setOrder(3);
+        bean.addUrlPatterns("/*");
+        return bean;
+    }
+
+
 }

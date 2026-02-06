@@ -15,8 +15,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import tools.jackson.databind.ObjectMapper;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,7 +37,7 @@ class JwtAuthenticationFilterTest {
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
         jwtAuthenticationFilter = new JwtAuthenticationFilter(tokenProvider, objectMapper);
-        SecurityContextHolder.clearContext();
+        LoginContext.remove();
     }
 
     @Test
@@ -49,7 +47,7 @@ class JwtAuthenticationFilterTest {
         // when
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         // then
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(LoginContext.get()).isNull();
         verify(filterChain).doFilter(request, response);
     }
 
@@ -66,9 +64,8 @@ class JwtAuthenticationFilterTest {
         // when
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         // then
-        Authentication result = SecurityContextHolder.getContext().getAuthentication();
-        assertThat(result.isAuthenticated()).isTrue();
-        assertThat(result.getPrincipal()).isEqualTo(userId);
+        String loginId = LoginContext.get();
+        assertThat(loginId).isEqualTo(userId);
     }
 
     @Test
@@ -82,7 +79,7 @@ class JwtAuthenticationFilterTest {
         // when
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         // then
-        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        assertThat(LoginContext.get()).isNull();
         String content = response.getContentAsString();
         assertThat(content).contains("EXPIRED_ACCESS_TOKEN");
 
