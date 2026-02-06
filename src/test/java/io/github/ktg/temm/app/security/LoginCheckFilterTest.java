@@ -29,6 +29,7 @@ class LoginCheckFilterTest {
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
         objectMapper = new ObjectMapper();
+        LoginContext.remove();
     }
     
     @Test
