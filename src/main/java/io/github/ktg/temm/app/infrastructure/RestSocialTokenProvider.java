@@ -1,9 +1,12 @@
-package io.github.ktg.temm.app.service;
+package io.github.ktg.temm.app.infrastructure;
 
 import io.github.ktg.temm.app.exception.SocialLoginFailedException;
+import io.github.ktg.temm.app.service.OAuth2TokenResponse;
+import io.github.ktg.temm.app.service.Oauth2Properties;
 import io.github.ktg.temm.app.service.Oauth2Properties.Provider;
 import io.github.ktg.temm.app.service.Oauth2Properties.Registration;
 import io.github.ktg.temm.domain.model.SocialType;
+import io.github.ktg.temm.domain.provider.SocialTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -14,7 +17,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
 @RequiredArgsConstructor
-public class RestSocialTokenService implements SocialTokenService {
+public class RestSocialTokenProvider implements SocialTokenProvider {
 
     private final Oauth2Properties oauth2Properties;
     private final WebClient webClient;

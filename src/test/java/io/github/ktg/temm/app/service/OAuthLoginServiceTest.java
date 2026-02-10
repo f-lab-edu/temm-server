@@ -13,6 +13,7 @@ import io.github.ktg.temm.app.exception.SocialLoginFailedException;
 import io.github.ktg.temm.domain.dto.SocialUserInfo;
 import io.github.ktg.temm.domain.model.SocialType;
 import io.github.ktg.temm.domain.model.User;
+import io.github.ktg.temm.domain.provider.SocialTokenProvider;
 import io.github.ktg.temm.domain.provider.SocialUserProvider;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.github.ktg.temm.domain.repository.UserRepository;
@@ -37,14 +38,14 @@ class OAuthLoginServiceTest {
     TokenProvider tokenProvider;
 
     @Mock
-    SocialTokenService socialTokenService;
+    SocialTokenProvider socialTokenProvider;
 
     OAuthLoginService oAuthLoginService;
 
     @BeforeEach
     void setUp() {
         oAuthLoginService = new OAuthLoginService(socialUserProviderFinder, userRepository,
-            tokenProvider, socialTokenService);
+            tokenProvider, socialTokenProvider);
     }
 
     @Test
@@ -54,7 +55,7 @@ class OAuthLoginServiceTest {
         SocialType socialType = SocialType.KAKAO;
         String idToken = "idToken";
         String code = "code";
-        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
+        given(socialTokenProvider.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(Optional.empty());
         // when
         // then
@@ -71,7 +72,7 @@ class OAuthLoginServiceTest {
         String idToken = "idToken";
         String code = "code";
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
-        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
+        given(socialTokenProvider.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider));
         given(mockSocialUserProvider.getUserInfo(idToken)).willThrow(
@@ -96,7 +97,7 @@ class OAuthLoginServiceTest {
         SocialUserInfo socialUserInfo = new SocialUserInfo(socialId, email, name);
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
 
-        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
+        given(socialTokenProvider.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider)
         );
@@ -126,7 +127,7 @@ class OAuthLoginServiceTest {
         User mockUser = User.create(name, email, socialType, socialId);
         SocialUserProvider mockSocialUserProvider = mock(SocialUserProvider.class);
 
-        given(socialTokenService.getToken(socialType, code)).willReturn(idToken);
+        given(socialTokenProvider.getToken(socialType, code)).willReturn(idToken);
         given(socialUserProviderFinder.find(socialType)).willReturn(
             Optional.of(mockSocialUserProvider)
         );

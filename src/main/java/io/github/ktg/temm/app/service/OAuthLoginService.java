@@ -5,6 +5,7 @@ import io.github.ktg.temm.app.exception.NotSupportSocialTypeException;
 import io.github.ktg.temm.domain.dto.SocialUserInfo;
 import io.github.ktg.temm.domain.model.SocialType;
 import io.github.ktg.temm.domain.model.User;
+import io.github.ktg.temm.domain.provider.SocialTokenProvider;
 import io.github.ktg.temm.domain.provider.SocialUserProvider;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.github.ktg.temm.domain.repository.UserRepository;
@@ -19,12 +20,12 @@ public class OAuthLoginService {
     private final SocialUserProviderFinder socialUserProviderFinder;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
-    private final SocialTokenService socialTokenService;
+    private final SocialTokenProvider socialTokenProvider;
 
     @Transactional
     public LoginResult login(SocialType socialType, String code) {
 
-        String socialToken = socialTokenService.getToken(socialType, code);
+        String socialToken = socialTokenProvider.getToken(socialType, code);
         SocialUserProvider socialUserProvider = getSocialUserProvider(socialType);
         SocialUserInfo socialUserInfo = socialUserProvider.getUserInfo(socialToken);
 

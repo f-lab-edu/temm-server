@@ -1,8 +1,8 @@
-package io.github.ktg.temm.app.service;
+package io.github.ktg.temm.domain.provider;
 
 import io.github.ktg.temm.domain.model.SocialType;
 
-public interface SocialTokenService {
+public interface SocialTokenProvider {
 
     String getToken(SocialType socialType, String code);
 
