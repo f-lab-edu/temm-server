@@ -6,7 +6,6 @@ import io.github.ktg.temm.app.dto.LoginResult;
 import io.github.ktg.temm.app.service.OAuthLoginService;
 import io.github.ktg.temm.domain.model.SocialType;
 import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -19,16 +18,25 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/v1/auth")
-@RequiredArgsConstructor
 public class OauthController {
 
+    public static final String ACCESS_TOKEN = "accessToken";
+    public static final String REFRESH_TOKEN = "refreshToken";
     private final OAuthLoginService oauthLoginService;
+    private final Long accessTokenValidity;
+    private final Long refreshTokenValidity;
 
-    @Value("${jwt.access-token-validity}")
-    private Long accessTokenValidity;
-    @Value("${jwt.refresh-token-validity}")
-    private Long refreshTokenValidity;
-
+    public OauthController(
+        OAuthLoginService oauthLoginService,
+        @Value("${jwt.access-token-validity}")
+        Long accessTokenValidity,
+        @Value("${jwt.refresh-token-validity}")
+        Long refreshTokenValidity
+    ) {
+        this.oauthLoginService = oauthLoginService;
+        this.accessTokenValidity = accessTokenValidity;
+        this.refreshTokenValidity = refreshTokenValidity;
+    }
 
     @PostMapping("/{socialType}/login")
     public ResponseEntity<?> login(
@@ -37,10 +45,10 @@ public class OauthController {
 
         LoginResult loginResult = oauthLoginService.login(socialType,
             oauthLoginRequest.code());
-        ResponseCookie accessToken = getHttpOnlyCookie("accessToken", loginResult.accessToken(),
-            accessTokenValidity);
-        ResponseCookie refreshToken = getHttpOnlyCookie("refreshToken", loginResult.refreshToken(),
-            refreshTokenValidity);
+        ResponseCookie accessToken = getHttpOnlyCookie(ACCESS_TOKEN, loginResult.accessToken(),
+            accessTokenValidity / 1000);
+        ResponseCookie refreshToken = getHttpOnlyCookie(REFRESH_TOKEN, loginResult.refreshToken(),
+            refreshTokenValidity / 1000);
         return ResponseEntity.ok()
             .header(HttpHeaders.SET_COOKIE, accessToken.toString(), refreshToken.toString())
             .body(OauthLoginResponse.from(loginResult));
