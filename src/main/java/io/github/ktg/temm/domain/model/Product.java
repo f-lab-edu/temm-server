@@ -54,11 +54,11 @@ public class Product extends BaseEntity {
         this.imageUrl = imageUrl;
     }
 
-    public static Product register(Long storeId, String sku, String name, String barcode, String imageUrl) {
+    public static Product create(Long storeId, String sku, String name, String barcode, String imageUrl) {
         return new Product(null, storeId, ProductStatus.REGISTERED, new Sku(sku), name, barcode, imageUrl);
     }
 
-    public void reRegister() {
+    public void register() {
         this.status = ProductStatus.REGISTERED;
     }
 
