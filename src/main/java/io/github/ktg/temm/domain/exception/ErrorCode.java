@@ -9,7 +9,8 @@ public enum ErrorCode {
     SOCIAL_TYPE_NOT_SUPPORTED(ErrorType.INVALID_INPUT, "지원하지 않는 소셜 로그인 입니다."),
     SOCIAL_LOGIN_FAILED(ErrorType.UNAUTHORIZED, "소셜 로그인이 실패 하였습니다."),
     SKU_IS_REQUIRED(ErrorType.INVALID_INPUT, "SKU 정보는 필수 입니다."),
-    SKU_PATTERN_NOT_MATCHED(ErrorType.INVALID_INPUT, "SKU 형식이 올바르지 않습니다.");
+    SKU_PATTERN_NOT_MATCHED(ErrorType.INVALID_INPUT, "SKU 형식이 올바르지 않습니다."),
+    STORE_SKU_DUPLICATE(ErrorType.BUSINESS_RULE_VIOLATION, "스토어 내 SKU는 중복 될 수 없습니다");
 
     private final ErrorType errorType;
     private final String message;
