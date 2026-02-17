@@ -1,5 +1,6 @@
 package io.github.ktg.temm.domain.model;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
@@ -8,7 +9,12 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,6 +32,9 @@ public class Product extends BaseEntity {
     @Column(name = "store_id", nullable = false)
     private Long storeId;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CategoryProducts> categoryProducts;
+
     @Embedded
     private Sku sku;
 
@@ -42,20 +51,34 @@ public class Product extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
-    private Product(Long id, Long storeId, ProductStatus status, Sku sku, String name,
-        String barcode,
-        String imageUrl) {
+
+    private Product(Long id, Long storeId, List<Category> categories, Sku sku,
+        ProductStatus status, String name, String barcode, String imageUrl) {
         this.id = id;
         this.storeId = storeId;
-        this.status = status;
         this.sku = sku;
+        this.status = status;
         this.name = name;
         this.barcode = barcode;
         this.imageUrl = imageUrl;
+        this.categoryProducts = new ArrayList<>();
+        addCategories(categories);
     }
 
-    public static Product create(Long storeId, String sku, String name, String barcode, String imageUrl) {
-        return new Product(null, storeId, ProductStatus.REGISTERED, new Sku(sku), name, barcode, imageUrl);
+    private void addCategories(List<Category> categories) {
+        Optional.ofNullable(categories)
+            .orElse(Collections.emptyList())
+            .forEach(this::addCategory);
+    }
+
+    private void addCategory(Category category) {
+        this.categoryProducts.add(
+            CategoryProducts.create(category, this)
+        );
+    }
+
+    public static Product create(Long storeId, List<Category> categories, String sku, String name, String barcode, String imageUrl) {
+        return new Product(null, storeId, categories, new Sku(sku), ProductStatus.REGISTERED, name, barcode, imageUrl);
     }
 
     public void register() {
@@ -84,6 +107,11 @@ public class Product extends BaseEntity {
 
     public void changeImage(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public void changeCategories(List<Category> categories) {
+        this.categoryProducts.clear();
+        addCategories(categories);
     }
 
 }

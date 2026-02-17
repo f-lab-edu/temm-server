@@ -30,5 +30,13 @@ public class CategoryProducts {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    private CategoryProducts(Long id, Category category, Product product) {
+        this.id = id;
+        this.category = category;
+        this.product = product;
+    }
 
+    public static CategoryProducts create(Category category, Product product) {
+        return new CategoryProducts(null, category, product);
+    }
 }
