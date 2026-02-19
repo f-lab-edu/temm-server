@@ -51,14 +51,23 @@ class ProductQueryDslRepositoryTest extends TestContainerForMySQL {
             null,
             null
         );
+        Product product2 = Product.create(
+            1L,
+            null,
+            "AA-BB-13",
+            "물품2",
+            null,
+            null
+        );
         em.persist(product1);
+        em.persist(product2);
         em.flush();
         em.clear();
     }
 
     @Test
-    @DisplayName("물품 상세 조회")
-    void findDetailById() {
+    @DisplayName("카테고리 있는 물품 상세 조회")
+    void findDetailWithCategory() {
         // given
         Long productId = em.createQuery("select p.id from Product p where name = '물품1'",
                 Long.class)
@@ -80,6 +89,33 @@ class ProductQueryDslRepositoryTest extends TestContainerForMySQL {
             .hasSize(2)
             .extracting("name")
             .containsExactlyInAnyOrder("사무", "식품");
+
+        ProductDetailStatusResult status = productDetail.status();
+        assertThat(status.code()).isEqualTo("REGISTERED");
+        assertThat(status.desc()).isEqualTo("등록");
+    }
+
+    @Test
+    @DisplayName("카테고리 없는 물품 상세 조회")
+    void findDetailWithoutCategory() {
+        // given
+        Long productId = em.createQuery("select p.id from Product p where name = '물품2'",
+                Long.class)
+            .getSingleResult();
+
+        // when
+        Optional<ProductDetailResult> result = productQueryDslRepository.findDetailById(
+            productId);
+
+        // then
+        assertThat(result).isPresent();
+        ProductDetailResult productDetail = result.get();
+
+        assertThat(productDetail.id()).isEqualTo(productId);
+        assertThat(productDetail.name()).isEqualTo("물품2");
+
+        List<ProductDetailCategoryResult> categories = productDetail.categories();
+        assertThat(categories).hasSize(0);
 
         ProductDetailStatusResult status = productDetail.status();
         assertThat(status.code()).isEqualTo("REGISTERED");
