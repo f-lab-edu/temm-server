@@ -20,16 +20,20 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "store_id", nullable = false)
+    private Long storeId;
+
     @Column(name = "name", nullable = false)
     private String name;
 
-    private Category(Long id, String name) {
+    private Category(Long id, Long storeId, String name) {
         this.id = id;
+        this.storeId = storeId;
         this.name = name;
     }
 
-    public static Category create(String name) {
-        return new Category(null, name);
+    public static Category create(Long storeId, String name) {
+        return new Category(null, storeId, name);
     }
 
 }

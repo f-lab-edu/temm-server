@@ -18,7 +18,6 @@ import io.github.ktg.temm.testcontainer.TestContainerForMySQL;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,11 +43,11 @@ class ProductQueryDslRepositoryTest extends TestContainerForMySQL {
     void setUp() {
         productQueryDslRepository = new ProductQueryDslRepository(jpaQueryFactory);
         LoginContext.set("testUser");
-        Category office = Category.create("사무");
-        Category food = Category.create("식품");
-        Category daily = Category.create("생필품");
-        Category electronics = Category.create("가전");
-        Category furniture = Category.create("가구");
+        Category office = Category.create(1L, "사무");
+        Category food = Category.create(1L, "식품");
+        Category daily = Category.create(1L, "생필품");
+        Category electronics = Category.create(1L, "가전");
+        Category furniture = Category.create(1L, "가구");
         em.persist(office);
         em.persist(food);
         em.persist(daily);
@@ -78,7 +77,7 @@ class ProductQueryDslRepositoryTest extends TestContainerForMySQL {
         em.clear();
     }
 
-    private static @NonNull Product createProduct(long storeId, List<Category> categories,
+    private Product createProduct(long storeId, List<Category> categories,
         String sku, String name, String barcode) {
         return Product.create(
             storeId,
