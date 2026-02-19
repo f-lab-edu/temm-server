@@ -23,4 +23,13 @@ public class Category {
     @Column(name = "name", nullable = false)
     private String name;
 
+    private Category(Long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public static Category create(String name) {
+        return new Category(null, name);
+    }
+
 }
