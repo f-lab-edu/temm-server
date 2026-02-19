@@ -33,7 +33,7 @@ public class Product extends BaseEntity {
     private Long storeId;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CategoryProducts> categoryProducts;
+    private List<CategoryProduct> categoryProducts;
 
     @Embedded
     private Sku sku;
@@ -73,7 +73,7 @@ public class Product extends BaseEntity {
 
     private void addCategory(Category category) {
         this.categoryProducts.add(
-            CategoryProducts.create(category, this)
+            CategoryProduct.create(category, this)
         );
     }
 

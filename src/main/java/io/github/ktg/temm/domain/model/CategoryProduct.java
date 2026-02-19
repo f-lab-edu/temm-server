@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "category_products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class CategoryProducts {
+public class CategoryProduct {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,13 +30,13 @@ public class CategoryProducts {
     @JoinColumn(name = "product_id")
     private Product product;
 
-    private CategoryProducts(Long id, Category category, Product product) {
+    private CategoryProduct(Long id, Category category, Product product) {
         this.id = id;
         this.category = category;
         this.product = product;
     }
 
-    public static CategoryProducts create(Category category, Product product) {
-        return new CategoryProducts(null, category, product);
+    public static CategoryProduct create(Category category, Product product) {
+        return new CategoryProduct(null, category, product);
     }
 }
