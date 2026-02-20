@@ -70,12 +70,12 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 등록 성공")
+    @DisplayName("물품 등록 성공")
     void register() throws Exception {
         // given
         ProductRegisterRequest request = new ProductRegisterRequest(
             1L,
-            "상품명",
+            "물품명",
             "SKU-123",
             "BARCODE-123",
             "http://image.url",
@@ -101,7 +101,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 등록 실패 - 필수 값 누락")
+    @DisplayName("물품 등록 실패 - 필수 값 누락")
     void registerFail() throws Exception {
         // given
         ProductRegisterRequest request = new ProductRegisterRequest(
@@ -130,12 +130,12 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 수정 성공")
+    @DisplayName("물품 수정 성공")
     void update() throws Exception {
         // given
         Long productId = 1L;
         ProductUpdateRequest request = new ProductUpdateRequest(
-            "수정된 상품명",
+            "수정된 물품명",
             "NEW-SKU",
             "NEW-BARCODE",
             "http://new.image.url",
@@ -157,7 +157,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 수정 실패 - 필수 값 누락")
+    @DisplayName("물품 수정 실패 - 필수 값 누락")
     void updateFail() throws Exception {
         // given
         Long productId = 1L;
@@ -182,7 +182,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 판매 중지 성공")
+    @DisplayName("물품 판매 중지 성공")
     void stop() throws Exception {
         // given
         Long productId = 1L;
@@ -199,7 +199,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 재등록 성공")
+    @DisplayName("물품 재등록 성공")
     void reRegister() throws Exception {
         // given
         Long productId = 1L;
@@ -216,7 +216,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 삭제 성공")
+    @DisplayName("물품 삭제 성공")
     void deleteProduct() throws Exception {
         // given
         Long productId = 1L;
@@ -233,13 +233,13 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("상품 상세 조회 성공")
+    @DisplayName("물품 상세 조회 성공")
     void getDetail() throws Exception {
         // given
         Long productId = 1L;
         ProductDetailResult result = new ProductDetailResult(
             productId,
-            "상품명",
+            "물품명",
             new ProductDetailStatusResult("REGISTERED", "등록"),
             "SKU-123",
             "BARCODE-123",
@@ -258,17 +258,17 @@ class ProductControllerTest {
         perform.andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(productId))
-            .andExpect(jsonPath("$.name").value("상품명"))
+            .andExpect(jsonPath("$.name").value("물품명"))
             .andExpect(jsonPath("$.status.code").value("REGISTERED"));
     }
 
     @Test
-    @DisplayName("상품 검색 성공")
+    @DisplayName("물품 검색 성공")
     void search() throws Exception {
         // given
         ProductSearchResult searchResult = new ProductSearchResult(
             1L,
-            "상품명",
+            "물품명",
             new ProductSearchStatusResult(ProductStatus.REGISTERED.name(), ProductStatus.REGISTERED.getDesc()),
             "SKU-123",
             "BARCODE-123",
@@ -281,7 +281,7 @@ class ProductControllerTest {
 
         MockHttpServletRequestBuilder builder = get("/api/v1/products")
             .param("storeId", "1")
-            .param("keyword", "상품")
+            .param("keyword", "물품")
             .param("page", "0")
             .param("size", "10");
 
@@ -292,18 +292,18 @@ class ProductControllerTest {
         perform.andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.content[0].id").value(1L))
-            .andExpect(jsonPath("$.content[0].name").value("상품명"))
-            .andExpect(jsonPath("$.page").value(0))
+            .andExpect(jsonPath("$.content[0].name").value("물품명"))
+            .andExpect(jsonPath("$.page").value(1))
             .andExpect(jsonPath("$.size").value(1))
             .andExpect(jsonPath("$.totalCount").value(1));
     }
 
     @Test
-    @DisplayName("상품 검색 실패 - 필수 값 누락")
+    @DisplayName("물품 검색 실패 - 필수 값 누락")
     void searchFail() throws Exception {
         // given
         MockHttpServletRequestBuilder builder = get("/api/v1/products")
-            .param("keyword", "상품")
+            .param("keyword", "물품")
             .param("page", "0")
             .param("size", "10");
 
