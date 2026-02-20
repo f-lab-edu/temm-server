@@ -6,6 +6,7 @@ import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -21,6 +22,7 @@ import tools.jackson.databind.ObjectMapper;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     public static final String BEARER_PREFIX = "Bearer ";
+    public static final String ACCESS_TOKEN = "accessToken";
 
     private final TokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
@@ -29,14 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, @Nonnull HttpServletResponse response,
         @Nonnull FilterChain filterChain) throws ServletException, IOException {
 
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
-            filterChain.doFilter(request, response);
-            return;
+        String token = extractTokenByHeader(request);
+        if (token == null) {
+            token = extractTokenByCookie(request);
         }
 
-        String token = authHeader.substring(BEARER_PREFIX.length());
-        if (token.isEmpty()) {
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,6 +50,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             writeExpiredTokenResponse(response);
         }
         filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenByCookie(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (ACCESS_TOKEN.equals(cookie.getName())) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private String extractTokenByHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith(BEARER_PREFIX)) {
+            return null;
+        }
+
+        String token = authHeader.substring(BEARER_PREFIX.length());
+        if (token.isEmpty()) {
+            return null;
+        }
+        return token;
     }
 
     private void writeExpiredTokenResponse(HttpServletResponse response) throws IOException {
