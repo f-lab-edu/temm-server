@@ -282,7 +282,7 @@ class ProductControllerTest {
         MockHttpServletRequestBuilder builder = get("/api/v1/products")
             .param("storeId", "1")
             .param("keyword", "물품")
-            .param("page", "0")
+            .param("page", "1")
             .param("size", "10");
 
         // when
