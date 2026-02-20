@@ -7,7 +7,7 @@ create table users (
     social_id varchar(200) not null
 );
 
--- 품목
+-- 물품
 create table products (
     id bigint auto_increment primary key,
     store_id bigint not null,
@@ -19,7 +19,8 @@ create table products (
     created_by varchar(40),
     updated_by varchar(40),
     created_at datetime default current_timestamp,
-    updated_at datetime default current_timestamp on update current_timestamp
+    updated_at datetime default current_timestamp on update current_timestamp,
+    constraint uk_products_store_id_sku unique (store_id, sku)
 );
 create index idx_products_store_id_status on products(store_id, status);
 
