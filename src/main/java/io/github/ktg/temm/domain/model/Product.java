@@ -38,7 +38,7 @@ public class Product extends BaseEntity {
     @Embedded
     private Sku sku;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "status", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private ProductStatus status;
 
