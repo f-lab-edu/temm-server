@@ -25,7 +25,7 @@ public class ProductRegisterService {
         validateStoreSkuDuplicate(command.storeId(), sku);
 
         List<Long> categoryIds = command.categoryIds();
-        List<Category> categories = getCategories(categoryIds);
+        List<Category> categories = getCategories(command.storeId(), categoryIds);
 
         Product newProduct = createProduct(command, categories);
         productRepository.save(newProduct);
@@ -37,8 +37,8 @@ public class ProductRegisterService {
             command.productName(), command.barcode(), command.imageUrl());
     }
 
-    private List<Category> getCategories(List<Long> categoryIds) {
-        return categoryRepository.findByIdIn(categoryIds);
+    private List<Category> getCategories(Long storeId, List<Long> categoryIds) {
+        return categoryRepository.findByStoreIdAndIdIn(storeId, categoryIds);
     }
 
     private void validateStoreSkuDuplicate(Long storeId, Sku sku) {
