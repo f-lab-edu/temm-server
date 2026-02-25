@@ -1,6 +1,8 @@
 package io.github.ktg.temm.domain.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,5 +30,19 @@ public class UserStore extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+
+    @Enumerated(EnumType.STRING)
+    private Authorization authorization;
+
+    private UserStore(Long id, User user, Store store, Authorization authorization) {
+        this.id = id;
+        this.user = user;
+        this.store = store;
+        this.authorization = authorization;
+    }
+
+    public static UserStore createManager(Store store, User user) {
+        return new UserStore(null, user, store, Authorization.MANAGER);
+    }
 
 }
