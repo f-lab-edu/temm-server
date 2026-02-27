@@ -1,5 +1,6 @@
 package io.github.ktg.temm.domain.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,6 +32,7 @@ public class UserStore extends BaseTimeEntity {
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
 
+    @Column(name = "authorization", nullable = false, length = 50)
     @Enumerated(EnumType.STRING)
     private Authorization authorization;
 
