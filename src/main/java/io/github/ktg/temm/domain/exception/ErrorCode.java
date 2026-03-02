@@ -11,7 +11,8 @@ public enum ErrorCode {
     SKU_IS_REQUIRED(ErrorType.INVALID_INPUT, "SKU 정보는 필수 입니다."),
     SKU_PATTERN_NOT_MATCHED(ErrorType.INVALID_INPUT, "SKU 형식이 올바르지 않습니다."),
     STORE_SKU_DUPLICATE(ErrorType.BUSINESS_RULE_VIOLATION, "스토어 내 SKU는 중복 될 수 없습니다"),
-    PRODUCT_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "물품을 찾을 수 없습니다.");
+    PRODUCT_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "물품을 찾을 수 없습니다."),
+    USER_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "유저를 찾을 수 없습니다.");
 
     private final ErrorType errorType;
     private final String message;
