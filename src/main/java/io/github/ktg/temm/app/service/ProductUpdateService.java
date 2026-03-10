@@ -34,8 +34,12 @@ public class ProductUpdateService {
         product.changeBarcode(command.barcode());
         product.changeImage(command.imageUrl());
 
-        List<Category> categories = categoryRepository.findByIdIn(command.categoryIds());
+        List<Category> categories = getCategories(storeId, command.categoryIds());
         product.changeCategories(categories);
+    }
+
+    private List<Category> getCategories(Long storeId, List<Long> categoryIds) {
+        return categoryRepository.findByStoreIdAndIdIn(storeId, categoryIds);
     }
 
     private Product getProduct(Long productId) {

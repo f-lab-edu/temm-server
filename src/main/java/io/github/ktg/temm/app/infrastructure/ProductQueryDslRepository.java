@@ -1,5 +1,9 @@
 package io.github.ktg.temm.app.infrastructure;
 
+import static io.github.ktg.temm.domain.model.QCategory.category;
+import static io.github.ktg.temm.domain.model.QCategoryProduct.categoryProduct;
+import static io.github.ktg.temm.domain.model.QProduct.product;
+
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -8,9 +12,6 @@ import io.github.ktg.temm.domain.dto.ProductSearchCondition;
 import io.github.ktg.temm.domain.dto.ProductSearchResult;
 import io.github.ktg.temm.domain.model.Product;
 import io.github.ktg.temm.domain.model.ProductStatus;
-import io.github.ktg.temm.domain.model.QCategory;
-import io.github.ktg.temm.domain.model.QCategoryProduct;
-import io.github.ktg.temm.domain.model.QProduct;
 import io.github.ktg.temm.domain.repository.ProductQueryRepository;
 import java.util.List;
 import java.util.Optional;
@@ -28,10 +29,6 @@ public class ProductQueryDslRepository implements ProductQueryRepository {
 
     @Override
     public Optional<ProductDetailResult> findDetailById(Long id) {
-        QProduct product = QProduct.product;
-        QCategoryProduct categoryProduct = QCategoryProduct.categoryProduct;
-        QCategory category = QCategory.category;
-
         Product result = jpaQueryFactory
             .selectFrom(product)
             .leftJoin(product.categoryProducts, categoryProduct).fetchJoin()
@@ -43,10 +40,6 @@ public class ProductQueryDslRepository implements ProductQueryRepository {
 
     @Override
     public Page<ProductSearchResult> search(ProductSearchCondition condition, Pageable pageable) {
-        QProduct product = QProduct.product;
-        QCategoryProduct categoryProduct = QCategoryProduct.categoryProduct;
-        QCategory category = QCategory.category;
-
         List<Product> result = jpaQueryFactory
             .selectFrom(product)
             .distinct()
@@ -80,21 +73,21 @@ public class ProductQueryDslRepository implements ProductQueryRepository {
     }
 
     private BooleanExpression storeIdEq(Long storeId) {
-        return storeId == null ? null : QProduct.product.storeId.eq(storeId);
+        return storeId == null ? null : product.storeId.eq(storeId);
     }
 
     private BooleanExpression statusEq(ProductStatus status) {
-        return status == null ? null : QProduct.product.status.eq(status);
+        return status == null ? null : product.status.eq(status);
     }
 
     private BooleanExpression keywordIsLikeOrEq(String keyword) {
         if (keyword == null || keyword.isBlank()) {
             return null;
         }
-        return QProduct.product.name.contains(keyword)
-            .or(QProduct.product.sku.value.contains(keyword))
-            .or(QCategory.category.name.contains(keyword))
-            .or(QProduct.product.barcode.eq(keyword));
+        return product.name.contains(keyword)
+            .or(product.sku.value.contains(keyword))
+            .or(category.name.contains(keyword))
+            .or(product.barcode.eq(keyword));
     }
 
 }

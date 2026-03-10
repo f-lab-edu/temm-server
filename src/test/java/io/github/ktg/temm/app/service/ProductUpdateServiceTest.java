@@ -3,6 +3,7 @@ package io.github.ktg.temm.app.service;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -46,7 +47,7 @@ class ProductUpdateServiceTest {
         given(product.getSku()).willReturn(new Sku("OLD-SKU"));
         given(productRepository.findById(productId)).willReturn(Optional.of(product));
         given(productRepository.existsByStoreIdAndSku(any(), any())).willReturn(false);
-        given(categoryRepository.findByIdIn(anyList())).willReturn(Collections.emptyList());
+        given(categoryRepository.findByStoreIdAndIdIn(anyLong(), anyList())).willReturn(Collections.emptyList());
 
         ProductUpdateCommand command = new ProductUpdateCommand(
             "new name",

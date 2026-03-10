@@ -17,7 +17,7 @@ public class SecurityConfig {
     private final TokenProvider tokenProvider;
     private final ObjectMapper objectMapper;
     private final String[] noAuthPathPatterns = new String[] {
-        "/api/v1/auth/**"
+        "/api/v1/auth/**", "/*.html", "/"
     };
 
     @Bean

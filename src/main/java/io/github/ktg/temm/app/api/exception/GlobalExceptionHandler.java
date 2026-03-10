@@ -82,7 +82,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.debug("unhandled exception: {}", e.getMessage());
+        log.warn("unhandled exception: {}", e.getMessage());
         return ResponseEntity.internalServerError().body(
             new ErrorResponse(
                 INTERNAL_SERVER_ERROR.name(), INTERNAL_SERVER_ERROR.getMessage())

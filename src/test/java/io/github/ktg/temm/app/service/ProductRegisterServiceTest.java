@@ -78,7 +78,7 @@ class ProductRegisterServiceTest {
             categoryIds, name, skuInput, barcode, imageUrl);
         given(productRepository.existsByStoreIdAndSku(storeId, sku))
             .willReturn(Boolean.FALSE);
-        given(categoryRepository.findByIdIn(categoryIds))
+        given(categoryRepository.findByStoreIdAndIdIn(storeId, categoryIds))
             .willReturn(List.of(mock(Category.class)));
 
         // then

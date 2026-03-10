@@ -13,18 +13,21 @@ import io.github.ktg.temm.app.service.ProductUpdateService;
 import io.github.ktg.temm.domain.dto.ProductDetailResult;
 import io.github.ktg.temm.domain.dto.ProductSearchResult;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -74,9 +77,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<PageResponse<ProductSearchResponse>> search(@Valid ProductSearchRequest request) {
-        int pageNumber = Math.max(request.page() - 1, 0);
-        Page<ProductSearchResult> result = productQueryService.search(request.toCondition(), pageNumber, request.size());
+    public ResponseEntity<PageResponse<ProductSearchResponse>> search(
+        @ModelAttribute @Valid ProductSearchRequest request,
+        @RequestParam(defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다.")
+        int page,
+        @RequestParam(defaultValue = "10") @Min(value = 1, message = "페이지 사이즈는 1 이상이어야 합니다.")
+        int size
+    ) {
+        Page<ProductSearchResult> result = productQueryService.search(request.toCondition(), page, size);
         Page<ProductSearchResponse> responsePage = result.map(ProductSearchResponse::from);
         return ResponseEntity.ok(PageResponse.from(responsePage));
     }

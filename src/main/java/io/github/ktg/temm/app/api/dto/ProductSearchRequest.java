@@ -7,9 +7,7 @@ import jakarta.validation.constraints.NotNull;
 public record ProductSearchRequest(
     @NotNull Long storeId,
     String keyword,
-    ProductStatus status,
-    int page,
-    int size
+    ProductStatus status
 ) {
 
     public ProductSearchCondition toCondition() {
