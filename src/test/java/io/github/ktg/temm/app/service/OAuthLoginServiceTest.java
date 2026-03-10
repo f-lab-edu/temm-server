@@ -17,6 +17,8 @@ import io.github.ktg.temm.domain.provider.SocialTokenProvider;
 import io.github.ktg.temm.domain.provider.SocialUserProvider;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.github.ktg.temm.domain.repository.UserRepository;
+import io.github.ktg.temm.domain.repository.UserStoreRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -40,12 +42,16 @@ class OAuthLoginServiceTest {
     @Mock
     SocialTokenProvider socialTokenProvider;
 
+    @Mock
+    UserStoreRepository userStoreRepository;
+
+
     OAuthLoginService oAuthLoginService;
 
     @BeforeEach
     void setUp() {
         oAuthLoginService = new OAuthLoginService(socialUserProviderFinder, userRepository,
-            tokenProvider, socialTokenProvider);
+            tokenProvider, socialTokenProvider, userStoreRepository);
     }
 
     @Test
@@ -113,6 +119,7 @@ class OAuthLoginServiceTest {
         then(userRepository).should().save(any(User.class));
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     @DisplayName("로그인 후 토큰 정보를 반환")
     void returnTokenInfo() {
@@ -137,7 +144,7 @@ class OAuthLoginServiceTest {
 
         String accessToken = "accessToken";
         String refreshToken = "refreshToken";
-        given(tokenProvider.generateAccessToken(any(String.class))).willReturn(accessToken);
+        given(tokenProvider.generateAccessToken(any(String.class), any(List.class))).willReturn(accessToken);
         given(tokenProvider.generateRefreshToken(any(String.class))).willReturn(refreshToken);
 
         // when

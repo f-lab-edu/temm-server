@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.ktg.temm.app.config.JpaAuditingConfig;
 import io.github.ktg.temm.app.config.QueryDslConfig;
 import io.github.ktg.temm.app.security.LoginContext;
+import io.github.ktg.temm.app.security.LoginUser;
 import io.github.ktg.temm.domain.dto.ProductDetailCategoryResult;
 import io.github.ktg.temm.domain.dto.ProductDetailResult;
 import io.github.ktg.temm.domain.dto.ProductDetailStatusResult;
@@ -18,6 +19,7 @@ import io.github.ktg.temm.testcontainer.TestContainerForMySQL;
 import jakarta.persistence.EntityManager;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +44,7 @@ class ProductQueryDslRepositoryTest extends TestContainerForMySQL {
     @BeforeEach
     void setUp() {
         productQueryDslRepository = new ProductQueryDslRepository(jpaQueryFactory);
-        LoginContext.set("testUser");
+        LoginContext.set(new LoginUser(UUID.randomUUID(), List.of()));
         Category office = Category.create(1L, "사무");
         Category food = Category.create(1L, "식품");
         Category daily = Category.create(1L, "생필품");

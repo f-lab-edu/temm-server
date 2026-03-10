@@ -6,6 +6,7 @@ import io.github.ktg.temm.app.config.JpaAuditingConfig;
 import io.github.ktg.temm.app.config.QueryDslConfig;
 import io.github.ktg.temm.app.dto.UserStoreQueryResult;
 import io.github.ktg.temm.app.security.LoginContext;
+import io.github.ktg.temm.app.security.LoginUser;
 import io.github.ktg.temm.domain.model.SocialType;
 import io.github.ktg.temm.domain.model.Store;
 import io.github.ktg.temm.domain.model.User;
@@ -38,7 +39,7 @@ class UserStoreQueryServiceTest extends TestContainerForMySQL {
         userStoreQueryService = new UserStoreQueryService(userStoreQueryRepository);
         User user = User.create("testuser", "testuser@naver.com", SocialType.GOOGLE, "aaaa");
         em.persist(user);
-        LoginContext.set(String.valueOf(user.getId()));
+        LoginContext.set(new LoginUser(user.getId(), List.of()));
 
         Store store1 = Store.create("store1", user);
         Store store2 = Store.create("store2", user);

@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.BDDMockito.verify;
 
 import jakarta.servlet.FilterChain;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,7 +59,7 @@ class LoginCheckFilterTest {
             objectMapper
         );
         request.setRequestURI("/api/v1/resource");
-        LoginContext.set("login!");
+        LoginContext.set(new LoginUser(UUID.randomUUID(), List.of()));
 
         // when
         loginCheckFilter.doFilterInternal(request, response, filterChain);

@@ -1,5 +1,6 @@
 package io.github.ktg.temm.app.infrastructure;
 
+import io.github.ktg.temm.domain.model.UserStore;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -11,6 +12,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import javax.crypto.SecretKey;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class JwtTokenProvider implements TokenProvider {
 
+    public static final String CLAIM_USER_STORES = "userStores";
     private final String issuer;
     private final Long accessTokenValidity;
     private final Long refreshTokenValidity;
@@ -43,12 +46,13 @@ public class JwtTokenProvider implements TokenProvider {
 
 
     @Override
-    public String generateAccessToken(String userId) {
+    public String generateAccessToken(String userId, List<UserStore> userStores) {
         Instant now = Instant.now();
         Instant expired = now.plusMillis(accessTokenValidity);
 
         return Jwts.builder()
             .subject(userId)
+            .claim(CLAIM_USER_STORES, userStores)
             .issuer(issuer)
             .issuedAt(Date.from(now))
             .expiration(Date.from(expired))
@@ -85,8 +89,19 @@ public class JwtTokenProvider implements TokenProvider {
 
     @Override
     public String getUserIdByAccessToken(String accessToken) {
-        Jws<Claims> claimsJws = jwtParser.parseSignedClaims(accessToken);
-        Claims payload = claimsJws.getPayload();
+        Claims payload = getPayload(accessToken);
         return payload.getSubject();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<UserStore> getUserStoresByAccessToken(String accessToken) {
+        Claims payload = getPayload(accessToken);
+        return payload.get(CLAIM_USER_STORES, List.class);
+    }
+
+    private Claims getPayload(String accessToken) {
+        Jws<Claims> claimsJws = jwtParser.parseSignedClaims(accessToken);
+        return claimsJws.getPayload();
     }
 }
