@@ -24,4 +24,21 @@ class StoreTest {
         assertThat(store.getUserStores().getFirst().getAuthorization()).isEqualTo(Authorization.MANAGER);
         assertThat(store.getUserStores().getFirst().getUser()).isEqualTo(user);
     }
+
+
+    @Test
+    @DisplayName("상점 이름 변경")
+    void changeName() {
+        // given
+        String storeName = "테스트 스토어";
+        String changeName = "test store";
+        Store store = Store.create(storeName, null);
+
+        // when
+        store.changeName(changeName);
+
+        // then
+        assertThat(store.getName()).isEqualTo(changeName);
+
+    }
 }

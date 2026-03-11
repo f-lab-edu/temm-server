@@ -47,4 +47,7 @@ public class Store extends BaseEntity {
         userStores.add(manager);
     }
 
+    public void changeName(String name) {
+        this.name = name;
+    }
 }
