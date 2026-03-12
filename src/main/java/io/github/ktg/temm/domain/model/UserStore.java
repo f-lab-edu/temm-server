@@ -47,4 +47,16 @@ public class UserStore extends BaseTimeEntity {
         return new UserStore(null, user, store, Authorization.MANAGER);
     }
 
+    public static UserStore createMember(Store store, User user) {
+        return new UserStore(null, user, store, Authorization.MEMBER);
+    }
+
+    public void toManager() {
+        this.authorization = Authorization.MANAGER;
+    }
+
+    public void toMember() {
+        this.authorization = Authorization.MEMBER;
+    }
+
 }
