@@ -42,6 +42,7 @@ public class GlobalExceptionHandler {
             case ENTITY_NOT_FOUND -> HttpStatus.NOT_FOUND;
             case INTERNAL_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
             case BUSINESS_RULE_VIOLATION -> HttpStatus.CONFLICT;
+            case FORBIDDEN -> HttpStatus.FORBIDDEN;
         };
     }
 

@@ -14,7 +14,9 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "물품을 찾을 수 없습니다."),
     USER_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "유저를 찾을 수 없습니다."),
     STORE_NOT_FOUND(ErrorType.ENTITY_NOT_FOUND, "스토어를 찾을 수 없습니다."),
-    USER_NOT_IN_STORE(ErrorType.ENTITY_NOT_FOUND, "스토어에 속하지 않은 유저 입니다.");
+    USER_NOT_IN_STORE(ErrorType.ENTITY_NOT_FOUND, "스토어에 속하지 않은 유저 입니다."),
+    LOGIN_REQUIRED(ErrorType.UNAUTHORIZED, "로그인이 필요 합니다."),
+    PERMISSION_DENIED(ErrorType.FORBIDDEN, "권한이 없습니다.");
 
     private final ErrorType errorType;
     private final String message;
