@@ -17,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.github.ktg.temm.app.api.dto.ProductRegisterRequest;
 import io.github.ktg.temm.app.api.dto.ProductUpdateRequest;
 import io.github.ktg.temm.app.security.LoginContext;
-import io.github.ktg.temm.app.security.LoginUser;
 import io.github.ktg.temm.app.service.ProductLifecycleService;
 import io.github.ktg.temm.app.service.ProductQueryService;
 import io.github.ktg.temm.app.service.ProductRegisterService;
@@ -30,7 +29,6 @@ import io.github.ktg.temm.domain.dto.ProductSearchResult;
 import io.github.ktg.temm.domain.dto.ProductSearchStatusResult;
 import io.github.ktg.temm.domain.model.ProductStatus;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -68,7 +66,7 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        LoginContext.set(new LoginUser(UUID.randomUUID(), List.of()));
+        LoginContext.set("loginUser");
     }
 
     @Test

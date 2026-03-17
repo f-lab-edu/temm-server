@@ -1,7 +1,6 @@
 package io.github.ktg.temm.app.security;
 
 import io.github.ktg.temm.app.api.exception.ErrorResponse;
-import io.github.ktg.temm.domain.model.UserStore;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.annotation.Nonnull;
@@ -11,8 +10,6 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -47,8 +44,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             if (tokenProvider.validateAccessToken(token)) {
                 String userId = tokenProvider.getUserIdByAccessToken(token);
-                List<UserStore> storeInfos = tokenProvider.getUserStoresByAccessToken(token);
-                LoginContext.set(getLoginUser(userId, storeInfos));
+                LoginContext.set(userId);
             }
         } catch (ExpiredJwtException e) {
             writeExpiredTokenResponse(response);
@@ -80,14 +76,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
         return token;
-    }
-
-    private LoginUser getLoginUser(String userId, List<UserStore> storeInfos) {
-        return new LoginUser(UUID.fromString(userId),
-            storeInfos.stream()
-            .map(LoginUserStore::from)
-            .toList()
-        );
     }
 
     private void writeExpiredTokenResponse(HttpServletResponse response) throws IOException {

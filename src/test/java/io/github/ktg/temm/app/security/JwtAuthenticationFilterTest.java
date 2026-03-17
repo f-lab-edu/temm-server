@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 import io.github.ktg.temm.domain.provider.TokenProvider;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -58,14 +57,14 @@ class JwtAuthenticationFilterTest {
         // given
         String token = "token1234";
         String authentication = "Bearer " + token;
-        String userId = String.valueOf(UUID.randomUUID());
+        String userId = "userId123";
         request.addHeader("Authorization", authentication);
         when(tokenProvider.validateAccessToken(token)).thenReturn(true);
         when(tokenProvider.getUserIdByAccessToken(token)).thenReturn(userId);
         // when
         jwtAuthenticationFilter.doFilterInternal(request, response, filterChain);
         // then
-        String loginId = String.valueOf(LoginContext.getUserId());
+        String loginId = LoginContext.get();
         assertThat(loginId).isEqualTo(userId);
     }
 

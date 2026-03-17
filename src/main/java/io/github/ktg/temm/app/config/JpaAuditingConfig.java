@@ -13,7 +13,7 @@ public class JpaAuditingConfig {
 
     @Bean
     public AuditorAware<String> auditorProvider() {
-        return () -> Optional.of(String.valueOf(LoginContext.getUserId()));
+        return () -> Optional.of(LoginContext.get());
     }
 
 }

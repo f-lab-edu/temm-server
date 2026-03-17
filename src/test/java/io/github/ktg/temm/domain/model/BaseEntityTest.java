@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import io.github.ktg.temm.app.config.JpaAuditingConfig;
 import io.github.ktg.temm.app.security.LoginContext;
-import io.github.ktg.temm.app.security.LoginUser;
 import io.github.ktg.temm.testcontainer.TestContainerForMySQL;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityManager;
@@ -12,8 +11,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PersistenceContext;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +26,7 @@ class BaseEntityTest extends TestContainerForMySQL {
 
     @BeforeEach
     void setUp() {
-        LoginContext.set(new LoginUser(UUID.randomUUID(), List.of()));
+        LoginContext.set("loginUserId");
     }
 
     @Test
