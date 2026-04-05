@@ -32,7 +32,8 @@ public class StoreController {
 
     @PostMapping
     public ResponseEntity<Void> create(@RequestBody @Valid StoreCreateRequest request) {
-        storeCreateService.create(request.toCommand(LoginContext.getUserId()));
+        UUID loginUserId = UUID.fromString(LoginContext.get());
+        storeCreateService.create(request.toCommand(loginUserId));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

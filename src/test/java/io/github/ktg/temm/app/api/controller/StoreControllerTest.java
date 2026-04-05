@@ -12,10 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import io.github.ktg.temm.app.api.dto.StoreCreateRequest;
 import io.github.ktg.temm.app.api.dto.StoreMemberAddRequest;
 import io.github.ktg.temm.app.api.dto.StoreUpdateRequest;
+import io.github.ktg.temm.app.security.LoginContext;
 import io.github.ktg.temm.app.service.StoreCreateService;
 import io.github.ktg.temm.app.service.StoreMemberService;
 import io.github.ktg.temm.app.service.StoreUpdateService;
 import java.util.UUID;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,16 @@ class StoreControllerTest {
 
     @MockitoBean
     StoreMemberService storeMemberService;
+
+    @BeforeEach
+    void setUp() {
+        LoginContext.set(UUID.randomUUID().toString());
+    }
+
+    @AfterEach
+    void tearDown() {
+        LoginContext.remove();
+    }
 
     @Test
     @DisplayName("상점 생성 성공")
