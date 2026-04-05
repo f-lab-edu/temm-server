@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface CheckPermission {
+public @interface CheckStorePermission {
 
     Authorization role() default Authorization.MEMBER;
 
