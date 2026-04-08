@@ -1,5 +1,6 @@
 package io.github.ktg.temm.app.api.controller;
 
+import io.github.ktg.temm.app.aop.CheckStorePermission;
 import io.github.ktg.temm.app.api.dto.PageResponse;
 import io.github.ktg.temm.app.api.dto.ProductDetailResponse;
 import io.github.ktg.temm.app.api.dto.ProductRegisterRequest;
@@ -12,6 +13,7 @@ import io.github.ktg.temm.app.service.ProductRegisterService;
 import io.github.ktg.temm.app.service.ProductUpdateService;
 import io.github.ktg.temm.domain.dto.ProductDetailResult;
 import io.github.ktg.temm.domain.dto.ProductSearchResult;
+import io.github.ktg.temm.domain.model.Authorization;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -41,42 +43,49 @@ public class ProductController {
     private final ProductQueryService productQueryService;
 
     @PostMapping
+    @CheckStorePermission(storeId = "#request.storeId", role = Authorization.MEMBER)
     public ResponseEntity<Void> register(@RequestBody @Valid ProductRegisterRequest request) {
         productRegisterService.register(request.toCommand());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @PutMapping("/{productId}")
+    @CheckStorePermission(productId = "#productId", role = Authorization.MEMBER)
     public ResponseEntity<Void> update(@PathVariable Long productId, @RequestBody @Valid ProductUpdateRequest request) {
         productUpdateService.update(productId, request.toCommand());
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{productId}/stop")
+    @CheckStorePermission(productId = "#productId", role = Authorization.MEMBER)
     public ResponseEntity<Void> stop(@PathVariable Long productId) {
         productLifecycleService.stop(productId);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{productId}/register")
+    @CheckStorePermission(productId = "#productId", role = Authorization.MEMBER)
     public ResponseEntity<Void> reRegister(@PathVariable Long productId) {
         productLifecycleService.register(productId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{productId}")
+    @CheckStorePermission(productId = "#productId", role = Authorization.MEMBER)
     public ResponseEntity<Void> delete(@PathVariable Long productId) {
         productLifecycleService.delete(productId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/{productId}")
+    @CheckStorePermission(productId = "#productId", role = Authorization.MEMBER)
     public ResponseEntity<ProductDetailResponse> getDetail(@PathVariable Long productId) {
         ProductDetailResult result = productQueryService.getDetail(productId);
         return ResponseEntity.ok(ProductDetailResponse.from(result));
     }
 
     @GetMapping
+    @CheckStorePermission(storeId = "#request.storeId", role =  Authorization.MEMBER)
     public ResponseEntity<PageResponse<ProductSearchResponse>> search(
         @ModelAttribute @Valid ProductSearchRequest request,
         @RequestParam(defaultValue = "1") @Min(value = 1, message = "페이지는 1 이상이어야 합니다.")
