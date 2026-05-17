@@ -54,6 +54,11 @@ public class StorePermissionAspect {
             return;
         }
 
+        if (hasText(checkStorePermission.placeId())) {
+            checkPermissionByPlaceId(checkStorePermission, context, userId);
+            return;
+        }
+
         throw new PermissionDeniedException();
     }
 
@@ -77,6 +82,12 @@ public class StorePermissionAspect {
         Long productId = getExpression(checkStorePermission.productId()).getValue(context,
             Long.class);
         userStorePermissionChecker.checkByProductId(userId, productId, checkStorePermission.role());
+    }
+
+    private void checkPermissionByPlaceId(CheckStorePermission checkStorePermission,
+        StandardEvaluationContext context, UUID userId) {
+        Long placeId = getExpression(checkStorePermission.placeId()).getValue(context, Long.class);
+        userStorePermissionChecker.checkByPlaceId(userId, placeId, checkStorePermission.role());
     }
 
     private Expression getExpression(String expression) {

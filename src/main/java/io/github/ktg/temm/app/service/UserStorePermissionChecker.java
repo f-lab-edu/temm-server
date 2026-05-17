@@ -1,9 +1,11 @@
 package io.github.ktg.temm.app.service;
 
 import io.github.ktg.temm.app.exception.PermissionDeniedException;
+import io.github.ktg.temm.app.exception.PlaceNotFoundException;
 import io.github.ktg.temm.app.exception.ProductNotFoundException;
 import io.github.ktg.temm.domain.model.Authorization;
 import io.github.ktg.temm.domain.model.UserStore;
+import io.github.ktg.temm.domain.repository.PlaceRepository;
 import io.github.ktg.temm.domain.repository.ProductRepository;
 import io.github.ktg.temm.domain.repository.UserStoreRepository;
 import java.util.UUID;
@@ -18,6 +20,7 @@ public class UserStorePermissionChecker {
 
     private final UserStoreRepository userStoreRepository;
     private final ProductRepository productRepository;
+    private final PlaceRepository placeRepository;
 
     public void checkByStoreId(UUID userId, Long storeId, Authorization requiredRole) {
         UserStore userStore = userStoreRepository.findByUserIdAndStoreId(userId, storeId)
@@ -32,6 +35,13 @@ public class UserStorePermissionChecker {
         Long storeId = productRepository.findById(productId)
             .orElseThrow(() -> new ProductNotFoundException(productId))
             .getStoreId();
+
+        checkByStoreId(userId, storeId, requiredRole);
+    }
+
+    public void checkByPlaceId(UUID userId, Long placeId, Authorization requiredRole) {
+        Long storeId = placeRepository.findStoreIdById(placeId)
+            .orElseThrow(() -> new PlaceNotFoundException(placeId));
 
         checkByStoreId(userId, storeId, requiredRole);
     }

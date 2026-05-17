@@ -15,4 +15,6 @@ public @interface CheckStorePermission {
     String storeId() default "";
 
     String productId() default "";
+
+    String placeId() default "";
 }
