@@ -1,6 +1,7 @@
 package io.github.ktg.temm.domain.model;
 
 import io.github.ktg.temm.domain.exception.InsufficientStockException;
+import io.github.ktg.temm.domain.exception.InventoryHasStockException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -57,5 +58,11 @@ public class Inventory extends BaseEntity {
 
     public void adjust(int newQuantity) {
         this.quantity = newQuantity;
+    }
+
+    public void validateDeletable() {
+        if (this.quantity != 0) {
+            throw new InventoryHasStockException();
+        }
     }
 }
