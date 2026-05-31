@@ -1,0 +1,2 @@
+create index idx_inventory_transactions_from_place_id on inventory_transactions(from_place_id);
+create index idx_inventory_transactions_to_place_id on inventory_transactions(to_place_id);
