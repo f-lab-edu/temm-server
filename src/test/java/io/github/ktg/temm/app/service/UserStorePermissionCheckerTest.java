@@ -6,11 +6,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.mock;
 
 import io.github.ktg.temm.app.exception.PermissionDeniedException;
+import io.github.ktg.temm.app.exception.PlaceNotFoundException;
 import io.github.ktg.temm.app.exception.ProductNotFoundException;
 import io.github.ktg.temm.domain.exception.ErrorCode;
 import io.github.ktg.temm.domain.model.Authorization;
 import io.github.ktg.temm.domain.model.Product;
 import io.github.ktg.temm.domain.model.UserStore;
+import io.github.ktg.temm.domain.repository.PlaceRepository;
 import io.github.ktg.temm.domain.repository.ProductRepository;
 import io.github.ktg.temm.domain.repository.UserStoreRepository;
 import java.util.Optional;
@@ -31,11 +33,14 @@ class UserStorePermissionCheckerTest {
     @Mock
     ProductRepository productRepository;
 
+    @Mock
+    PlaceRepository placeRepository;
+
     UserStorePermissionChecker userStorePermissionChecker;
 
     @BeforeEach
     void setUp() {
-        userStorePermissionChecker = new UserStorePermissionChecker(userStoreRepository, productRepository);
+        userStorePermissionChecker = new UserStorePermissionChecker(userStoreRepository, productRepository, placeRepository);
     }
 
     @Test
@@ -173,6 +178,56 @@ class UserStorePermissionCheckerTest {
         // when
         // then
         assertThatThrownBy(() -> userStorePermissionChecker.checkByProductId(userId, productId, Authorization.MANAGER))
+            .isInstanceOf(PermissionDeniedException.class)
+            .hasMessageContaining(ErrorCode.PERMISSION_DENIED.getMessage());
+    }
+
+    @Test
+    @DisplayName("장소의 스토어에 권한이 있으면 통과")
+    void checkByPlaceIdSuccess() {
+        // given
+        UUID userId = UUID.randomUUID();
+        Long placeId = 20L;
+        Long storeId = 1L;
+        UserStore userStore = mock(UserStore.class);
+        given(placeRepository.findStoreIdById(placeId)).willReturn(Optional.of(storeId));
+        given(userStoreRepository.findByUserIdAndStoreId(userId, storeId)).willReturn(Optional.of(userStore));
+        given(userStore.getAuthorization()).willReturn(Authorization.MEMBER);
+
+        // when
+        // then
+        assertThatCode(() -> userStorePermissionChecker.checkByPlaceId(userId, placeId, Authorization.MEMBER))
+            .doesNotThrowAnyException();
+    }
+
+    @Test
+    @DisplayName("존재하지 않는 장소 ID로 체크 시 예외")
+    void checkByPlaceIdNotFound() {
+        // given
+        UUID userId = UUID.randomUUID();
+        Long placeId = 20L;
+        given(placeRepository.findStoreIdById(placeId)).willReturn(Optional.empty());
+
+        // when
+        // then
+        assertThatThrownBy(() -> userStorePermissionChecker.checkByPlaceId(userId, placeId, Authorization.MEMBER))
+            .isInstanceOf(PlaceNotFoundException.class)
+            .hasMessageContaining(ErrorCode.PLACE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    @DisplayName("장소의 스토어에 속하지 않은 유저는 권한 예외")
+    void checkByPlaceIdUserNotInStore() {
+        // given
+        UUID userId = UUID.randomUUID();
+        Long placeId = 20L;
+        Long storeId = 1L;
+        given(placeRepository.findStoreIdById(placeId)).willReturn(Optional.of(storeId));
+        given(userStoreRepository.findByUserIdAndStoreId(userId, storeId)).willReturn(Optional.empty());
+
+        // when
+        // then
+        assertThatThrownBy(() -> userStorePermissionChecker.checkByPlaceId(userId, placeId, Authorization.MEMBER))
             .isInstanceOf(PermissionDeniedException.class)
             .hasMessageContaining(ErrorCode.PERMISSION_DENIED.getMessage());
     }
